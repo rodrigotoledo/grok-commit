@@ -1,14 +1,61 @@
 #!/usr/bin/env ruby
 
-require 'open3'   # For running Git commands
+require 'open3'    # For running Git commands
 require 'net/http' # For HTTP requests
 require 'json'     # For JSON parsing
+require 'optparse' # For command-line argument parsing
+
+# Parse command-line options
+options = {}
+OptionParser.new do |opts|
+  opts.banner = "Usage: grok-commit [--set-language=<lang>]\nAvailable languages: en, pt-BR"
+
+  opts.on("--set-language=LANG", "Set the language for commit messages (e.g., en, pt-BR)") do |lang|
+    options[:set_language] = lang
+  end
+end.parse!
+
+# Handle language setting
+if options[:set_language]
+  valid_languages = ['en', 'pt-BR']
+  unless valid_languages.include?(options[:set_language])
+    puts "Error: Invalid language '#{options[:set_language]}'. Use 'en' or 'pt-BR'."
+    exit 1
+  end
+
+  # Determine shell config file (prefer ~/.zshrc if Zsh, else ~/.bashrc)
+  shell_config = File.exist?(File.expand_path('~/.zshrc')) ? '~/.zshrc' : '~/.bashrc'
+
+  # Update or append GROK_COMMIT_LANGUAGE to shell config
+  config_path = File.expand_path(shell_config)
+  config_content = File.exist?(config_path) ? File.read(config_path) : ''
+  language_line = "export GROK_COMMIT_LANGUAGE=\"#{options[:set_language]}\""
+
+  if config_content.match?(/^export GROK_COMMIT_LANGUAGE=/)
+    # Replace existing language setting
+    new_content = config_content.gsub(/^export GROK_COMMIT_LANGUAGE=.*/, language_line)
+    File.write(config_path, new_content)
+  else
+    # Append new language setting with a newline before
+    File.open(config_path, 'a') { |f| f.puts("\n#{language_line}") }
+  end
+
+  puts "Language set to '#{options[:set_language]}' in #{shell_config}. Reload your shell with 'source #{shell_config}'."
+  exit 0
+end
 
 # Retrieve the API key from environment
 api_key = ENV['GROK_API_KEY']
 if api_key.nil? || api_key.empty?
   puts "Error: Please set the GROK_API_KEY environment variable with your xAI API key."
   puts "For API details, visit https://x.ai/api."
+  exit 1
+end
+
+# Get language from environment (default to English)
+language = ENV['GROK_COMMIT_LANGUAGE'] || 'en'
+unless ['en', 'pt-BR'].include?(language)
+  puts "Error: Invalid GROK_COMMIT_LANGUAGE '#{language}'. Use 'en' or 'pt-BR'."
   exit 1
 end
 
@@ -24,9 +71,9 @@ unless diff_status.success?
   exit 1
 end
 
-# Optimized prompt for Grok
+# Optimized prompt for Grok based on language
 prompt = <<~PROMPT
-  Generate a concise Git commit message in English (e.g., "feat: adds new functionality").
+  Generate a concise Git commit message in #{language} (e.g., "feat: adds new functionality").
   Base it on these changes:
 
   #{diff_output}
