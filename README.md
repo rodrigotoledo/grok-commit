@@ -155,10 +155,15 @@ Add to your shell profile (e.g., ~/.bashrc or ~/.zshrc):
 
 ```
 export GROK_API_KEY="your-xai-api-key-here"
-export GROK_COMMIT_LANGUAGE="en"
 ```
 
-Reload your shell:
+And language:
+
+```bash
+grok-commit --set-language=pt-BR
+```
+
+Reload your shell (or `~/.zshrc`):
 
 ```bash
 source ~/.bashrc
@@ -166,7 +171,7 @@ source ~/.bashrc
 
 Test Installation:
 
-Run grok-commit in a Git repo with staged changes. It should generate and commit automatically.
+Run `grok-commit` in a Git repo with staged changes. It should generate and commit automatically.
 
 Usage
 
