@@ -73,7 +73,7 @@ end
 
 # Optimized prompt for Grok based on language
 prompt = <<~PROMPT
-  Generate a concise Git commit message in #{language} (e.g., "feat: adds new functionality").
+  Generate a concise Git commit message in #{language} (e.g., "feature: adds new functionality").
   Base it on these changes:
 
   #{diff_output}
