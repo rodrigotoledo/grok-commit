@@ -1,16 +1,9 @@
 # Grok-Commit: AI-Powered Git Commit Messages Using Grok API
 
-This is a simple Bash tool that generates concise Git commit messages using the xAI Grok API (e.g., Grok-3 model). It analyzes your staged changes (git diff --cached), sends them to the API, generates a message in Conventional Commits format (e.g., "feat: adds new feature"), and automatically commits them.
-Features
-
 Automatic commit message generation in English.
 Uses xAI's Grok API for intelligent summaries.
 Limits diff size to avoid token overuse.
 Handles errors gracefully (e.g., no staged changes, API failures).
-
-Prerequisites
-
-Git installed.# Grok-Commit: AI-Powered Git Commit Messages Using Grok API
 
 This is a simple Bash tool that generates concise Git commit messages using the xAI Grok API (e.g., Grok-3 model). It analyzes your staged changes (`git diff --cached`), sends them to the API, generates a message in Conventional Commits format (e.g., "feat: adds new feature"), and automatically commits them.
 
@@ -179,23 +172,3 @@ In a Git repository, stage your changes:
 git add .
 grok-commit
 ```
-
-It will generate a message like feat: update vehicle location job, commit it, and output "Commit successful!".
-
-Troubleshooting
-
-No staged changes: Add files with git add.
-API Key Error: Verify with echo $GROK_API_KEY and ensure credits in https://console.x.ai.
-API Errors (e.g., 500): Check xAI status at https://status.x.ai or try model 'grok-4' in the script.
-Commit Fails: Ensure Git is configured (git config --global user.name/email).
-Large Diffs: The script limits to 5,000 chars; for bigger, edit manually.
-
-Customization
-
-Edit grok-commit to change the model (e.g., 'grok-4'), prompt language, or add features like confirmation prompts.
-Costs: ~$0.0004 per call with Grok-3 (monitor in xAI console).
-
-License
-MIT License. Feel free to fork and contribute!
-Contributing
-Pull requests welcome! Open issues for bugs or features.
