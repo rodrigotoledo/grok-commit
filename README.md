@@ -1,6 +1,6 @@
 # Grok-Commit: AI-Powered Git Commit Messages Using Grok API
 
-This is a simple Ruby CLI tool that generates concise Git commit messages using the xAI Grok API (e.g., Grok-3 model). It analyzes your staged changes (git diff --cached), sends them to the API, generates a message in Conventional Commits format (e.g., "feat: adds new feature"), and automatically commits them.
+This is a simple Bash tool that generates concise Git commit messages using the xAI Grok API (e.g., Grok-3 model). It analyzes your staged changes (git diff --cached), sends them to the API, generates a message in Conventional Commits format (e.g., "feat: adds new feature"), and automatically commits them.
 Features
 
 Automatic commit message generation in English.
@@ -10,10 +10,9 @@ Handles errors gracefully (e.g., no staged changes, API failures).
 
 Prerequisites
 
-Ruby 2.7+ (installed on most Unix systems; check with ruby -v).
 Git installed.# Grok-Commit: AI-Powered Git Commit Messages Using Grok API
 
-This is a simple Ruby CLI tool that generates concise Git commit messages using the xAI Grok API (e.g., Grok-3 model). It analyzes your staged changes (`git diff --cached`), sends them to the API, generates a message in Conventional Commits format (e.g., "feat: adds new feature"), and automatically commits them.
+This is a simple Bash tool that generates concise Git commit messages using the xAI Grok API (e.g., Grok-3 model). It analyzes your staged changes (`git diff --cached`), sends them to the API, generates a message in Conventional Commits format (e.g., "feat: adds new feature"), and automatically commits them.
 
 ## Features
 
@@ -24,7 +23,6 @@ This is a simple Ruby CLI tool that generates concise Git commit messages using 
 
 ## Prerequisites
 
-- Ruby 2.7+ (installed on most Unix systems; check with `ruby -v`).
 - Git installed.
 - An xAI API key (obtain from https://console.x.ai; requires credits or subscription).
 - Access to a terminal (Linux/macOS recommended; Windows may need adjustments).
