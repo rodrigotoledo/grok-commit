@@ -153,7 +153,7 @@ Set Your API Key:
 
 Add to your shell profile (e.g., ~/.bashrc or ~/.zshrc):
 
-```
+```.bashrc
 export GROK_API_KEY="your-xai-api-key-here"
 ```
 

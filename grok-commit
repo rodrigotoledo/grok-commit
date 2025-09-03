@@ -73,7 +73,7 @@ end
 
 # Optimized prompt for Grok based on language
 prompt = <<~PROMPT
-  Generate a concise Git commit message in #{language} (e.g., "feature: adds new functionality").
+  Generate a concise Git commit message in #{language} in Conventional Commits format (e.g., "feat: adds new functionality"). Use only the prefix "feat", "fix", "docs", "style", "refactor", "test", or "chore". Do not include quotes or extra explanatory text.
   Base it on these changes:
 
   #{diff_output}
@@ -87,7 +87,7 @@ model = 'grok-3'  # More stable and cost-effective
 request_body = {
   model: model,
   messages: [
-    { role: 'system', content: 'You are an assistant that generates clear and professional Git commit messages.' },
+    { role: 'system', content: 'You are an assistant that generates clear and professional Git commit messages in Conventional Commits format.' },
     { role: 'user', content: prompt }
   ],
   max_tokens: 200,  # Increased to avoid "length" cutoff
@@ -129,6 +129,10 @@ if generated_message.nil? || generated_message.empty?
   puts "No commit message generated. API response: #{response_data.inspect}"
   exit 1
 end
+
+# Sanitize the generated message
+generated_message = generated_message.gsub(/['"]/, '') # Remove quotes
+generated_message = generated_message[/^(feat|fix|docs|style|refactor|test|chore): .*/] || generated_message # Keep only valid Conventional Commits format
 
 # Perform the commit automatically
 commit_command = "git commit -m '#{generated_message.gsub("'", "\\'")}'"
