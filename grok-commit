@@ -73,7 +73,7 @@ end
 
 # Optimized prompt for Grok based on language
 prompt = <<~PROMPT
-  Generate a concise Git commit message in #{language} in Conventional Commits format (e.g., "feat: adds new functionality"). Use only the prefix "feat", "fix", "docs", "style", "refactor", "test", or "chore". Do not include quotes or extra explanatory text.
+  Generate a concise Git commit message in #{language} in Conventional Commits format (e.g., "adds new functionality"). Use only the prefix "feat", "fix", "docs", "style", "refactor", "test", or "chore". Do not include quotes or extra explanatory text.
   Base it on these changes:
 
   #{diff_output}
