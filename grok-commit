@@ -1,0 +1,93 @@
+#!/usr/bin/env ruby
+
+require 'open3'   # For running Git commands
+require 'net/http' # For HTTP requests
+require 'json'     # For JSON parsing
+
+# Retrieve the API key from environment
+api_key = ENV['GROK_API_KEY']
+if api_key.nil? || api_key.empty?
+  puts "Error: Please set the GROK_API_KEY environment variable with your xAI API key."
+  puts "For API details, visit https://x.ai/api."
+  exit 1
+end
+
+# Capture the diff of staged changes (limit to 5,000 characters)
+diff_output, diff_status = Open3.capture2('git diff --cached')
+diff_output = diff_output[0..5_000] # Limit to reduce tokens
+if diff_output.empty?
+  puts "No staged changes found. Please run 'git add' first."
+  exit 1
+end
+unless diff_status.success?
+  puts "Error running git diff: #{diff_status}"
+  exit 1
+end
+
+# Optimized prompt for Grok
+prompt = <<~PROMPT
+  Generate a concise Git commit message in English (e.g., "feat: adds new functionality").
+  Base it on these changes:
+
+  #{diff_output}
+PROMPT
+
+# API call configuration
+api_endpoint = 'https://api.x.ai/v1/chat/completions'
+model = 'grok-3'  # More stable and cost-effective
+
+# Prepare the request body
+request_body = {
+  model: model,
+  messages: [
+    { role: 'system', content: 'You are an assistant that generates clear and professional Git commit messages.' },
+    { role: 'user', content: prompt }
+  ],
+  max_tokens: 200,  # Increased to avoid "length" cutoff
+  temperature: 0.7
+}.to_json
+
+# Make the HTTP request
+uri = URI(api_endpoint)
+http = Net::HTTP.new(uri.host, uri.port)
+http.use_ssl = true
+http.verify_mode = OpenSSL::SSL::VERIFY_PEER
+
+request = Net::HTTP::Post.new(uri.path)
+request['Authorization'] = "Bearer #{api_key}"
+request['Content-Type'] = 'application/json'
+request.body = request_body
+
+begin
+  response = http.request(request)
+  response_code = response.code.to_i
+  if response_code == 500
+    puts "Error 500: Internal server issue at xAI. Try again later or check https://status.x.ai/."
+    puts "Response body: #{response.body}"
+    exit 1
+  end
+  unless response_code == 200
+    puts "API Error: Code #{response_code} - #{response.body}"
+    exit 1
+  end
+rescue => e
+  puts "Request error: #{e.message}. Check the API key with 'echo $GROK_API_KEY'."
+  exit 1
+end
+
+# Extract the generated message
+response_data = JSON.parse(response.body)
+generated_message = response_data['choices']&.first&.dig('message', 'content')&.strip
+if generated_message.nil? || generated_message.empty?
+  puts "No commit message generated. API response: #{response_data.inspect}"
+  exit 1
+end
+
+# Perform the commit automatically
+commit_command = "git commit -m '#{generated_message.gsub("'", "\\'")}'"
+puts "Running: #{commit_command}"
+success = system(commit_command)
+unless success
+  puts "Error executing commit. Check Git status with 'git status'."
+  exit 1
+end
